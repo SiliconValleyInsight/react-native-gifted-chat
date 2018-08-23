@@ -82,6 +82,10 @@ export default class MessageContainer extends React.Component {
     this._invertibleScrollViewRef.scrollTo(options);
   }
 
+  scrollToEnd(options) {
+    this._invertibleScrollViewRef.getScrollResponder().scrollToEnd(options)
+  }
+
   renderLoadEarlier() {
     if (this.props.loadEarlier === true) {
       const loadEarlierProps = {

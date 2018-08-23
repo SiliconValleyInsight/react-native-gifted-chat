@@ -19,6 +19,8 @@ export default class InputToolbar extends React.Component {
 
     this.state = {
       position: 'absolute',
+      width: 0,
+      height: 0
     };
   }
 
@@ -79,10 +81,21 @@ export default class InputToolbar extends React.Component {
     return null;
   }
 
+  _onLayout = e => {
+    const { width, height } = e.nativeEvent.layout
+    this.setState({ width, height })
+  }
+
+  getHeight = () => {
+    const { height } = this.state
+    return height
+  }
+
   render() {
     return (
       <View
         style={[styles.container, this.props.containerStyle, { position: this.state.position }]}
+        onLayout={this._onLayout}
       >
         <View style={[styles.primary, this.props.primaryStyle]}>
           {this.renderActions()}
