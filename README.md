@@ -1,4 +1,10 @@
 <p align="center" >
+  WIP! Do not merge! Not ready to use yet!
+
+  This is the master branch of GiftedChat repo with the FlatList component.
+  Need more work for production.
+</p>
+<p align="center" >
     <img alt="react-native-gifted-chat" src="https://thumbs.gfycat.com/AbsoluteSadDobermanpinscher-size_restricted.gif" width="260" height="510" />
 
 </p>
