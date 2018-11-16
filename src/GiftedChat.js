@@ -115,9 +115,9 @@ class GiftedChat extends React.Component {
   }
 
   componentDidMount () {
-    setTimeout(() => {
-      this.scrollToBottom(false)
-    }, 150)
+    /* setTimeout(() => {
+     *   this.scrollToBottom(false)
+     * }, 200) */
   }
 
   componentWillReceiveProps(nextProps = {}) {

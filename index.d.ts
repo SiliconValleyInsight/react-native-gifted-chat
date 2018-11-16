@@ -21,6 +21,7 @@ export interface IChatMessage {
     name: string;
     avatar: string;
   };
+  image?: string;
 }
 
 export interface ISystemMessage {
@@ -86,9 +87,9 @@ interface BubbleProps {
   bottomContainerStyle: LeftRightStyle<ViewStyle>;
   tickStyle: TextStyle;
   containerToNextStyle: LeftRightStyle<ViewStyle>;
-  containertoPreviousStyle: LeftRightStyle<ViewStyle>;
+  containerToPreviousStyle: LeftRightStyle<ViewStyle>;
   // TODO: remove in next major release
-  isSameDay?(currentMessage: IMessage, inextMessage: IMessage): boolean;
+  isSameDay?(currentMessage: IMessage, nextMessage: IMessage): boolean;
   isSameUser?(currentMessage: IMessage, nextMessage: IMessage): boolean;
 }
 
@@ -98,7 +99,7 @@ interface ComposerProps {
   composerHeight?: number;
   text?: string;
   placeholder?: string;
-  placeholderTextCoolor?: string;
+  placeholderTextColor?: string;
   textInputProps?: Partial<TextInputProperties>;
   onTextChanged?(text: string): void;
   onInputSizeChanged?(contentSize: number): void;
@@ -117,7 +118,7 @@ interface DayProps {
   wrapperStyle?: ViewStyle;
   textStyle?: TextStyle;
   // TODO: remove in next major release
-  isSameDay?(currentMessage: IMessage, inextMessage: IMessage): boolean;
+  isSameDay?(currentMessage: IMessage, nextMessage: IMessage): boolean;
   isSameUser?(currentMessage: IMessage, nextMessage: IMessage): boolean;
   dateFormat?: string;
 }
@@ -135,7 +136,7 @@ export class GiftedAvatarProps extends React.Component<GiftedAvatarProps> { }
 
 export interface GiftedChatProps {
   /* Messages to display */
-  messages?: any[];
+  messages?: IMessage[];
   /* Input text; default is undefined, but if specified, it will override GiftedChat's internal state */
   text?: string;
   /* Placeholder when text is empty; default is 'Type a message...' */
@@ -168,6 +169,8 @@ export interface GiftedChatProps {
   renderAvatar?(props: AvatarProps): React.ReactNode;
   /* Whether to render an avatar for the current user; default is false, only show avatars for other users */
   showUserAvatar?: boolean;
+  /* When false, avatars will only be displayed when a consecutive message is from the same user on the same day; default is false */
+  showAvatarForEveryMessage?: boolean;
   /* Callback when a message avatar is tapped */
   onPressAvatar?(user: User): void;
   /* Render the message avatar at the top of consecutive messages, rather than the bottom; default is false */
@@ -181,7 +184,7 @@ export interface GiftedChatProps {
   /* Reverses display order of messages; default is true */
   inverted?: boolean;
   /*Custom message container */
-  renderMessage?(message: any): React.ReactNode;
+  renderMessage?(message: IMessage): React.ReactNode;
   /* Custom message text */
   renderMessageText?(messageText: MessageTextProps): React.ReactNode;
   /* Custom message image */
@@ -193,9 +196,9 @@ export interface GiftedChatProps {
   /* Custom view inside the bubble */
   renderCustomView?(): React.ReactNode;
   /*Custom day above a message*/
-  renderDay?(): React.ReactNode;
+  renderDay?(props: DayProps): React.ReactNode;
   /* Custom time inside a message */
-  renderTime?(): React.ReactNode;
+  renderTime?(props: TimeProps): React.ReactNode;
   /* Custom footer component on the ListView, e.g. 'User is typing...' */
   renderFooter?(): React.ReactNode;
   /* Custom component to render below the MessageContainer (separate from the ListView) */
@@ -232,15 +235,15 @@ export interface GiftedChatProps {
 
 export class GiftedChat extends React.Component<GiftedChatProps> {
   static append(
-    currentMessages: any[],
-    messages: any[],
+    currentMessages: IMessage[],
+    messages: IMessage[],
     inverted?: boolean
-  ): any[];
+  ): IMessage[];
   static prepend(
-    currentMessages: any[],
-    messages: any[],
+    currentMessages: IMessage[],
+    messages: IMessage[],
     inverted?: boolean
-  ): any[];
+  ): IMessage[];
 }
 
 interface InputToolbarProps {
@@ -318,8 +321,8 @@ interface MessageTextProps {
   currentMessage?: IMessage;
   containerStyle?: LeftRightStyle<ViewStyle>;
   textStyle?: LeftRightStyle<TextStyle>;
-  linkStyle?: LeftRightStyle<LinkStyle>;
-  parsePatterns?(linkStyle: LinkStyle): any;
+  linkStyle?: LeftRightStyle<TextStyle>;
+  parsePatterns?(linkStyle: TextStyle): any;
   textProps?: TextProperties;
   customTextStyle?: TextStyle;
 }
@@ -357,7 +360,7 @@ interface TimeProps {
 export class Time extends React.Component<TimeProps> { }
 
 export type utils = {
-  isSameUser(currrentMessage?: IMessage, message?: IMessage): boolean;
+  isSameUser(currentMessage?: IMessage, message?: IMessage): boolean;
   isSameDay(currentMessage?: IMessage, message?: IMessage): boolean;
   isSameTime(currentMessage?: IMessage, message?: IMessage): boolean;
 };
