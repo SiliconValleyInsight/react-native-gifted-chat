@@ -307,17 +307,25 @@ class GiftedChat extends React.Component {
     this.setIsTypingDisabled(false);
   }
 
-  scrollToBottom(animated = true) {
+  scrollToBottom (animated = true) {
     if (!this._messageContainerRef) {
-      return;
+      return
     }
 
     const { inverted } = this.props
     if (inverted) {
-      this._messageContainerRef.scrollTo({ y: 0, animated });
+      this._messageContainerRef.scrollTo({ y: 0, animated })
     } else {
       this._messageContainerRef.scrollToEnd({ animated })
     }
+  }
+
+  scrollTo ({ y = 0, animated = true }) {
+    if (!this._messageContainerRef) {
+      return
+    }
+
+    this._messageContainerRef.scrollTo({ y, animated })
   }
 
   renderMessages() {
