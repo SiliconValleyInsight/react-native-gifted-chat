@@ -134,6 +134,67 @@ export default class Bubble extends React.Component {
     return null;
   }
 
+  tailColor = color => {
+    if (!color) {
+      return null
+    }
+
+    if (this.props.position === 'left') {
+      return {
+        borderRightColor: color,
+        borderBottomColor: color,
+        borderTopColor: 'transparent',
+        borderLeftColor: 'transparent'
+      }
+    }
+
+    return {
+      borderLeftColor: color,
+      borderBottomColor: color,
+      borderTopColor: 'transparent',
+      borderRightColor: 'transparent'
+    }
+  }
+
+  handleBubbleTail = () => {
+    if (this.props.tailVisible) {
+      if (this.props.position === 'left') {
+        return StyleSheet.create({
+          marginLeft: 8
+        })
+      } else {
+        return StyleSheet.create({
+          marginRight: 8
+        })
+      }
+    }
+
+    return null
+  }
+
+  renderTail = () => {
+    if (
+      !this.props.tailVisible ||
+      (
+        isSameUser(this.props.currentMessage, this.props.nextMessage) &&
+        isSameDay(this.props.currentMessage, this.props.nextMessage)
+      )
+    ) {
+      return null
+    }
+
+    return (
+      <View
+        style={[
+          styles[this.props.position].tail,
+          this.tailColor(
+            this.props.wrapperStyle[this.props.position].backgroundColor
+          )
+        ]}
+      />
+    )
+  }
+
   render() {
     return (
       <View
@@ -142,12 +203,15 @@ export default class Bubble extends React.Component {
           this.props.containerStyle[this.props.position],
         ]}
       >
+        {this.renderTail()}
+
         <View
           style={[
             styles[this.props.position].wrapper,
             this.props.wrapperStyle[this.props.position],
             this.handleBubbleToNext(),
             this.handleBubbleToPrevious(),
+            this.handleBubbleTail()
           ]}
         >
           <TouchableWithoutFeedback
@@ -191,6 +255,16 @@ const styles = {
     containerToPrevious: {
       borderTopLeftRadius: 3,
     },
+    tail: {
+      position: 'absolute',
+      bottom: 20,
+      left: -4,
+      borderWidth: 6,
+      borderRightColor: Color.leftBubbleBackground,
+      borderBottomColor: Color.leftBubbleBackground,
+      borderTopColor: 'transparent',
+      borderLeftColor: 'transparent'
+    },
   }),
   right: StyleSheet.create({
     container: {
@@ -209,6 +283,16 @@ const styles = {
     },
     containerToPrevious: {
       borderTopRightRadius: 3,
+    },
+    tail: {
+      position: 'absolute',
+      bottom: 20,
+      right: -4,
+      borderWidth: 6,
+      borderLeftColor: Color.rightBubbleBackground,
+      borderBottomColor: Color.rightBubbleBackground,
+      borderTopColor: 'transparent',
+      borderRightColor: 'transparent'
     },
   }),
   bottom: {
