@@ -2,7 +2,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { StyleSheet, View, Keyboard, ViewPropTypes } from 'react-native';
+import { Platform, StyleSheet, View, Keyboard, ViewPropTypes } from 'react-native';
 
 import Composer from './Composer';
 import Send from './Send';
@@ -19,6 +19,7 @@ export default class InputToolbar extends React.Component {
 
     this.state = {
       position: 'absolute',
+      bottom: 0,
       width: 0,
       height: 0
     };
@@ -27,11 +28,31 @@ export default class InputToolbar extends React.Component {
   componentWillMount() {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+    if (Platform.OS === 'android') {
+      this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
+      this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
+    }
   }
 
   componentWillUnmount() {
     this.keyboardWillShowListener.remove();
     this.keyboardWillHideListener.remove();
+    if (Platform.OS === 'android') {
+      this.keyboardDidShowListener.remove()
+      this.keyboardDidHideListener.remove()
+    }
+  }
+
+  keyboardDidShow = () => {
+    this.setState({
+      bottom: 13 // magic number, chosen empirically
+    });
+  }
+
+  keyboardDidHide = () => {
+    this.setState({
+      bottom: 0
+    });
   }
 
   keyboardWillShow() {
@@ -94,7 +115,14 @@ export default class InputToolbar extends React.Component {
   render() {
     return (
       <View
-        style={[styles.container, this.props.containerStyle, { position: this.state.position }]}
+        style={[
+          styles.container,
+          this.props.containerStyle,
+          {
+            position: this.state.position,
+            bottom: this.state.bottom
+          }
+        ]}
         onLayout={this._onLayout}
       >
         <View style={[styles.primary, this.props.primaryStyle]}>

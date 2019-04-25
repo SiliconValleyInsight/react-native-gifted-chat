@@ -233,7 +233,7 @@ class GiftedChat extends React.Component {
     // These calculations rely on the constants and some magic numbers (at least for me).
     // I think it will be better to use onLayout to get real height in InputToolbar and Message containers for that.
     const result = composerHeight + (this.getMinInputToolbarHeight() - MIN_COMPOSER_HEIGHT);
-    return result + 10 // TODO Fix. Magic number
+    return result
   }
 
   /**
