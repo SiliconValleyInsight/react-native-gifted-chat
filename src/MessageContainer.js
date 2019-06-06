@@ -9,7 +9,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { ListView, View, StyleSheet } from 'react-native';
+import { Easing, Animated, TouchableOpacity, ListView, View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'
 
 import shallowequal from 'shallowequal';
 import InvertibleScrollView from 'react-native-invertible-scroll-view';
@@ -36,7 +37,11 @@ export default class MessageContainer extends React.Component {
     const messagesData = this.prepareMessages(props.messages);
     this.state = {
       dataSource: dataSource.cloneWithRows(messagesData.blob, messagesData.keys),
+      showScrollToBottomButton: false,
+      animatingScrollToBottomButton: false
     };
+
+    this.animatedValue = new Animated.Value(0)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -146,10 +151,86 @@ export default class MessageContainer extends React.Component {
     );
   }
 
+  _onScroll = event => {
+    if (!this.props.scrollToBottom) {
+      return
+    }
+
+    const yOffset = event.nativeEvent.contentOffset.y
+    const {
+      showScrollToBottomButton: prevShowScrollToBottomButton,
+      animatingScrollToBottomButton
+    } = this.state
+    const showScrollToBottomButton = yOffset > 150
+
+    if (
+      prevShowScrollToBottomButton !== showScrollToBottomButton &&
+      !animatingScrollToBottomButton
+    ) {
+      Animated.timing(this.animatedValue).stop()
+
+      if (showScrollToBottomButton) {
+        // showing the button
+        this.setState({
+          showScrollToBottomButton,
+          animatingScrollToBottomButton: true
+        })
+
+        Animated.timing(this.animatedValue, {
+          toValue: 1,
+          easing: Easing.in,
+          duration: 150
+        }).start(() => {
+          this.setState({ animatingScrollToBottomButton: false })
+        })
+      } else {
+        // hiding the button
+        this.setState({ animatingScrollToBottomButton: true })
+        Animated.timing(this.animatedValue, {
+          toValue: 0,
+          easing: Easing.in,
+          duration: 100
+        }).start(() => {
+          this.setState({
+            showScrollToBottomButton,
+            animatingScrollToBottomButton: false
+          })
+        })
+      }
+    }
+  }
+
+  _onScrollToBottomPress = () => {
+    this.setState({ animatingScrollToBottomButton: true })
+
+    const { inverted } = this.props
+    if (inverted) {
+      this.scrollTo({ y: 0, animated: true })
+    } else {
+      this.scrollToEnd({ animated: true })
+    }
+
+    Animated.timing(this.animatedValue, {
+      toValue: 0,
+      easing: Easing.in,
+      duration: 100
+    }).start(() => {
+      this.setState({ showScrollToBottomButton: false })
+    })
+
+    setTimeout(() => {
+      this.setState({ animatingScrollToBottomButton: false })
+    }, 1000)
+  }
+
   render() {
     const contentContainerStyle = this.props.inverted
       ? {}
       : styles.notInvertedContentContainerStyle;
+    const { showScrollToBottomButton } = this.state
+    const animatedStyle = {
+      transform: [{ scale: this.animatedValue }]
+    }
 
     return (
       <View style={styles.container}>
@@ -165,7 +246,20 @@ export default class MessageContainer extends React.Component {
           renderHeader={this.props.inverted ? this.renderFooter : this.renderLoadEarlier}
           renderFooter={this.props.inverted ? this.renderLoadEarlier : this.renderFooter}
           renderScrollComponent={this.renderScrollComponent}
+          onScroll={this._onScroll}
+          scrollEventThrottle={100}
         />
+        {showScrollToBottomButton && (
+          <TouchableOpacity style={styles.scrollToBottomTouchable} onPress={this._onScrollToBottomPress}>
+            <Animated.View style={[ styles.scrollToBottomButton, animatedStyle ]}>
+              <Ionicons
+                style={styles.icon}
+                name={'ios-arrow-down'}
+                size={24}
+              />
+            </Animated.View>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -179,6 +273,28 @@ const styles = StyleSheet.create({
   notInvertedContentContainerStyle: {
     justifyContent: 'flex-end',
   },
+  scrollToBottomTouchable: {
+    position: 'absolute',
+    bottom: 14,
+    right: 12,
+    zIndex: 1
+  },
+  scrollToBottomButton: {
+    opacity: 0.8,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6
+  },
+  icon: {
+    marginTop: 4
+  }
 });
 
 MessageContainer.defaultProps = {
