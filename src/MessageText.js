@@ -86,6 +86,7 @@ export default class MessageText extends React.Component {
             { type: 'email', style: linkStyle, onPress: this.onEmailPress },
           ]}
           childrenProps={{ ...this.props.textProps }}
+          {...this.props.parsedTextProps}
         >
           {this.props.currentMessage.text}
         </ParsedText>

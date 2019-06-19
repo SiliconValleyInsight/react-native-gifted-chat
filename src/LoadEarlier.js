@@ -18,14 +18,20 @@ export default class LoadEarlier extends React.Component {
   renderLoading() {
     if (this.props.isLoadingEarlier === false) {
       return (
-        <Text style={[styles.text, this.props.textStyle]}>
+        <Text
+          style={[styles.text, this.props.textStyle]}
+          {...this.props.textProps}
+        >
           {this.props.label}
         </Text>
       );
     }
     return (
       <View>
-        <Text style={[styles.text, this.props.textStyle, { opacity: 0 }]}>
+        <Text
+          style={[styles.text, this.props.textStyle, { opacity: 0 }]}
+          {...this.props.textProps}
+        >
           {this.props.label}
         </Text>
         <ActivityIndicator
@@ -36,6 +42,7 @@ export default class LoadEarlier extends React.Component {
       </View>
     );
   }
+
   render() {
     return (
       <TouchableOpacity
